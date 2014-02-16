@@ -108,7 +108,7 @@ public abstract class Tarkistaja : PhysicsGame
                 tulos = TarkistaTehtava4();
                 break;
             case 5:
-                //TODO: Aki/Jussi kirjoita tarkistakoodi
+                tulos = TarkistaTehtava5();
                 break;
             case 6:
                 //TODO: Aki/Jussi kirjoita tarkistakoodi
@@ -157,6 +157,62 @@ public abstract class Tarkistaja : PhysicsGame
         
     }
 
+    private TehtavanTila TarkistaTehtava5()
+    {
+        TehtavanTila tila = TehtavanTila.EiToteutettu;
+        try
+        {
+            if (objektitEnnenTehtavaa == null)
+            {
+                // Precondition
+                objektitEnnenTehtavaa = GetObjects(go => go is PhysicsObject);
+                Tehtava5();
+                // Tehtavan kutsumisen jälkeen pitää antaa JyPelille aikaa tehdä työnsä.
+                //  tähän tarkistajaan tullaan siis myöhemmin uudelleen, mutta tätä haaraa ei enää tehdä.
+                tila = TehtavanTila.ToteutettuSaattaaToimia;
+                return tila;
+            }
+
+            List<GameObject> uudet = GetObjects(go => go is PhysicsObject && !objektitEnnenTehtavaa.Contains(go));
+
+            /*string teksti = String.Format("left {0}, position {1}, top {2}, right {3}, X {4}, bottom {5}, Y {6}", 
+                Math.Round(uudet[0].Left), uudet[0].Position, (int)uudet[0].Top, (int)uudet[0].Right, uudet[0].X, (int)uudet[0].Bottom, uudet[0].Y);
+            MessageDisplay.Add(teksti);
+            string leveltext = String.Format(" bottom, {0}, height {1}, left {2}, size {3}, top {4}, width {5} ", 
+                Level.Bottom, Level.Height, Level.Left, Level.Size, Level.Top, Level.Width);
+            MessageDisplay.Add(leveltext);*/
+
+            tila = TehtavanTila.ToteutettuEiToimi;
+            if (uudet.Count < 4)
+            {
+                MessageDisplay.Add("Et ole lisännyt kaikkia neljää reunaa");
+            }
+            else if (uudet.Count > 4)
+            {
+                MessageDisplay.Add("Olet lisännyt liian monta pelioliota");
+            }
+            else if (!TarkistaOlioidenMuoto(Shape.Rectangle, uudet))
+            {
+                MessageDisplay.Add("Reunat ovat väärän muotoiset");
+            }
+            else if (!TarkistaReunat(uudet))
+            {
+                MessageDisplay.Add("Reunat ovat väärän kokoiset tai väärässä paikassa");
+            }
+            else
+            {
+                tila = TehtavanTila.ToteutettuToimii;
+                objektitEnnenTehtavaa.Clear();
+                objektitEnnenTehtavaa = null;
+            }
+        }
+        catch (NotImplementedException)
+        {
+            tila = TehtavanTila.EiToteutettu;
+        }
+        return tila;
+    }
+
     private TehtavanTila TarkistaTehtava4()
     {
         TehtavanTila tila = TehtavanTila.EiToteutettu;
@@ -167,7 +223,7 @@ public abstract class Tarkistaja : PhysicsGame
                 objektienLukumaaraTehtava4 = RandomGen.NextInt(100, 150);
                 // Precondition
                 objektitEnnenTehtavaa = GetObjects(go => go is PhysicsObject);
-                Tehtava5(objektienLukumaaraTehtava4);
+                Tehtava4(objektienLukumaaraTehtava4);
                 // Tehtavan kutsumisen jälkeen pitää antaa JyPelille aikaa tehdä työnsä.
                 //  tähän tarkistajaan tullaan siis myöhemmin uudelleen, mutta tätä haaraa ei enää tehdä.
                 tila = TehtavanTila.ToteutettuSaattaaToimia;
@@ -191,15 +247,15 @@ public abstract class Tarkistaja : PhysicsGame
             }
             else if (!TarkistaOlioidenVari(Color.White, talletetutObjektitTehtava4))
             {
-                MessageDisplay.Add("Pallosi väri ei ole valkoinen");
+                MessageDisplay.Add("Pallot eivät ole valkoisia!");
             }
             else if (talletetutObjektitTehtava4[0].Position == new Vector(0, 0))
             {
-                MessageDisplay.Add("Pallosi on keskellä ruutua. Oletko varma, että laitoit sen satunnaiseen paikkaan? Yritä uudestaan!");
+                MessageDisplay.Add("Pallosi on keskellä ruutua. Oletko varma, että laitoit sen satunnaiseen paikkaan? Yritä uudestaan");
             }
             else if (!TarkistaOlioidenEtaisyys(300, talletetutObjektitTehtava4))
             {
-                MessageDisplay.Add("Pallosi on liian kaukana keskipisteestä. Yritäppä uudestaan varmuuden vuoksi!");
+                MessageDisplay.Add("Pallosi on liian kaukana keskipisteestä. Yritäppä uudestaan varmuuden vuoksi");
             }
             else
             {
@@ -328,10 +384,12 @@ public abstract class Tarkistaja : PhysicsGame
 
     bool TarkistaOlioidenMuoto(Shape muoto, List<GameObject> oliot )
     {
+        //MessageDisplay.Add("muoto");
         for (int i = 0; i < oliot.Count; i++)
         {
             if (oliot[i].Shape != muoto)
             {
+                //MessageDisplay.Add("muoto false");
                 return false;
             }
         }
@@ -365,6 +423,45 @@ public abstract class Tarkistaja : PhysicsGame
         return true;
     }
 
+    bool TarkistaReunat(List<GameObject> oliot)
+    {
+        bool returnValue = true;
+        
+        for (int i = 0; i < oliot.Count; i++ )
+        {
+            // Tarkista on vasen tai oikea reuna
+            if (oliot[i].Y == 0)
+            {
+                // Tarkista koko
+                if (oliot[i].Width != Level.Height)
+                {
+                    returnValue = false;
+                }
+                // Tarista paikka
+                else if ((Math.Abs(oliot[i].X) - (oliot[i].Height/2)) != (Level.Width/2))
+                {
+                    returnValue = false;
+                }
+            }
+            // Tarkista onko ylä tai ala reuna
+            else if (oliot[i].X == 0)
+            {
+                // Tarkista koko
+                if (oliot[i].Width != (Level.Width+(oliot[i].Height*2)))
+                {
+                    returnValue = false;
+                }
+                // Tarkista paikka
+                else if ((Math.Abs(oliot[i].Y) - (oliot[i].Height/2)) != (Level.Height / 2))
+                {
+                    returnValue = false;
+                }
+            }
+        }
+
+        return returnValue;
+    }
+
     /*
      * Tehtävänanto: Palauta muuttujien a ja b summa (plus lasku)
      */
@@ -387,12 +484,12 @@ public abstract class Tarkistaja : PhysicsGame
      * Vector paikka = RandomGen.NextVector(0.0, 300.0);
      * (vinkki, käytä for-silmukkaa)
      */
-    public virtual void Tehtava4() { throw new NotImplementedException(); }
+    public virtual void Tehtava4(int n) { throw new NotImplementedException(); }
 
     /*
      * Tehtävänanto: Lisää peliin reunat joka puolelle
      */
-    public virtual void Tehtava5(int n) { throw new NotImplementedException(); }
+    public virtual void Tehtava5() { throw new NotImplementedException(); }
 
     /*
      * Tehtävänanto: Lyö PUNAISELLE pallolle vauhtia satunnaiseen suuntaan
