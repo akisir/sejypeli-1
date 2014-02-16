@@ -24,9 +24,12 @@ public abstract class Tarkistaja : PhysicsGame
     GameObject pacman;
     GameObject haamut;
     List<GameObject> kolikot;
+    int objektienLukumaaraTehtava4 = 0;
 
     // Tehtävien tilatiedot
-    List<GameObject> objektitEnnenTehtavaa3 = null;
+    List<GameObject> objektitEnnenTehtavaa = null;
+    List<GameObject> talletetutObjektitTehtava3 = null;
+    List<GameObject> talletetutObjektitTehtava4 = null;
 
     public override void Begin()
     {
@@ -102,7 +105,7 @@ public abstract class Tarkistaja : PhysicsGame
                 tulos = TarkistaTehtava3();
                 break;
             case 4:
-                //TODO: Aki/Jussi kirjoita tarkistakoodi
+                tulos = TarkistaTehtava4();
                 break;
             case 5:
                 //TODO: Aki/Jussi kirjoita tarkistakoodi
@@ -154,15 +157,75 @@ public abstract class Tarkistaja : PhysicsGame
         
     }
 
+    private TehtavanTila TarkistaTehtava4()
+    {
+        TehtavanTila tila = TehtavanTila.EiToteutettu;
+        try
+        {
+            if (objektitEnnenTehtavaa == null)
+            {
+                objektienLukumaaraTehtava4 = RandomGen.NextInt(100, 150);
+                // Precondition
+                objektitEnnenTehtavaa = GetObjects(go => go is PhysicsObject);
+                Tehtava5(objektienLukumaaraTehtava4);
+                // Tehtavan kutsumisen jälkeen pitää antaa JyPelille aikaa tehdä työnsä.
+                //  tähän tarkistajaan tullaan siis myöhemmin uudelleen, mutta tätä haaraa ei enää tehdä.
+                tila = TehtavanTila.ToteutettuSaattaaToimia;
+                return tila;
+            }
+
+            List<GameObject> talletetutObjektitTehtava4 = GetObjects(go => go is PhysicsObject && !objektitEnnenTehtavaa.Contains(go));
+
+            tila = TehtavanTila.ToteutettuEiToimi;
+            if (talletetutObjektitTehtava4.Count < objektienLukumaaraTehtava4)
+            {
+                MessageDisplay.Add("Peliolioita ei ole lisätty tarpeeksi monta");
+            }
+            else if (talletetutObjektitTehtava4.Count > objektienLukumaaraTehtava4)
+            {
+                MessageDisplay.Add("Liian monta uutta pelioliota lisätty");
+            }
+            else if (!TarkistaOlioidenMuoto(Shape.Circle, talletetutObjektitTehtava4))
+            {
+                MessageDisplay.Add("Lisäämäsi pallo ei ole pyöreä");
+            }
+            else if (!TarkistaOlioidenVari(Color.White, talletetutObjektitTehtava4))
+            {
+                MessageDisplay.Add("Pallosi väri ei ole valkoinen");
+            }
+            else if (talletetutObjektitTehtava4[0].Position == new Vector(0, 0))
+            {
+                MessageDisplay.Add("Pallosi on keskellä ruutua. Oletko varma, että laitoit sen satunnaiseen paikkaan? Yritä uudestaan!");
+            }
+            else if (!TarkistaOlioidenEtaisyys(300, talletetutObjektitTehtava4))
+            {
+                MessageDisplay.Add("Pallosi on liian kaukana keskipisteestä. Yritäppä uudestaan varmuuden vuoksi!");
+            }
+            else
+            {
+                tila = TehtavanTila.ToteutettuToimii;
+                objektitEnnenTehtavaa.Clear();
+                objektitEnnenTehtavaa = null;
+
+                //Timer.SingleShot(0.1, TuhoaPallot);
+            }
+        }
+        catch (NotImplementedException)
+        {
+            tila = TehtavanTila.EiToteutettu;
+        }
+        return tila;
+    }
+
     private TehtavanTila TarkistaTehtava3()
     {
         TehtavanTila tila = TehtavanTila.EiToteutettu;
         try
         {
-            if (objektitEnnenTehtavaa3 == null)
+            if (objektitEnnenTehtavaa == null)
             {
                 // Precondition
-                objektitEnnenTehtavaa3 = GetObjects(go => go is PhysicsObject);
+                objektitEnnenTehtavaa = GetObjects(go => go is PhysicsObject);
                 Tehtava3();
                 // Tehtavan kutsumisen jälkeen pitää antaa JyPelille aikaa tehdä työnsä.
                 //  tähän tarkistajaan tullaan siis myöhemmin uudelleen, mutta tätä haaraa ei enää tehdä.
@@ -170,12 +233,13 @@ public abstract class Tarkistaja : PhysicsGame
                 return tila;
             }
 
-            List<GameObject> uudet = GetObjects(go => go is PhysicsObject && !objektitEnnenTehtavaa3.Contains(go));
+            List<GameObject> uudet = GetObjects(go => go is PhysicsObject && !objektitEnnenTehtavaa.Contains(go));
+            talletetutObjektitTehtava3 = uudet;
 
             tila = TehtavanTila.ToteutettuEiToimi;
             if (uudet.Count == 0)
             {
-                MessageDisplay.Add("Palloa edustavaa pelioliota ei ole lisätty");
+                MessageDisplay.Add("Punaista palloa edustavaa pelioliota ei ole lisätty");
             }
             else if (uudet.Count > 1)
             {
@@ -185,13 +249,15 @@ public abstract class Tarkistaja : PhysicsGame
             {
                 MessageDisplay.Add("Lisäämäsi pallo ei ole pyöreä");
             }
-            else if (uudet[0].Color != Color.White)
+            else if (uudet[0].Color != Color.Red)
             {
-                MessageDisplay.Add("Olet vaihtanut pallon väriä. Kiva, mutta lisäämäsi pallon tulisi olla valkoinen");
+                MessageDisplay.Add("Pallosi ei ole punainen, muistitko vaihtaa värin oikein!");
             }
             else
             {
                 tila = TehtavanTila.ToteutettuToimii;
+                objektitEnnenTehtavaa.Clear();
+                objektitEnnenTehtavaa = null;
             }
         }
         catch (NotImplementedException)
@@ -260,6 +326,44 @@ public abstract class Tarkistaja : PhysicsGame
         return tila;
     }
 
+    bool TarkistaOlioidenMuoto(Shape muoto, List<GameObject> oliot )
+    {
+        for (int i = 0; i < oliot.Count; i++)
+        {
+            if (oliot[i].Shape != muoto)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool TarkistaOlioidenVari(Color vari, List<GameObject> oliot)
+    {
+        for (int i = 0; i < oliot.Count; i++)
+        {
+            if (oliot[i].Color != vari)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool TarkistaOlioidenEtaisyys(int maxEtaisyys, List<GameObject> oliot)
+    {
+        for (int i = 0; i < oliot.Count; i++)
+        {
+            if (oliot[i].X > maxEtaisyys || oliot[i].Y > maxEtaisyys)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     /*
      * Tehtävänanto: Palauta muuttujien a ja b summa (plus lasku)
@@ -273,46 +377,45 @@ public abstract class Tarkistaja : PhysicsGame
     public virtual double Tehtava2(double x, double y, double z) { throw new NotImplementedException(); }
 
     /*
-     * Tehtävänanto: Lisää peliin pallo 
+     * Tehtävänanto: Lisää PUNAINEN pallo peliin
      */
     public virtual void Tehtava3() { throw new NotImplementedException(); }
-    
 
     /*
-     * Tehtävänanto: Lisää PUNAINEN pallo peliin satunnaiseen paikkaan
-     * Tässä tehdään satunnainen paikka korkeintaan 100.0 päähän ruudun keskipisteestä
-     *   Vector paikka = RandomGen.NextVector(0.0, 100.0);
+     * Tehtävänanto: Lisää peliin n kpl satunnaisessa paikassa olevaa VALKOISTA palloa
+     * korkeintaan 300.0 päähän ruudun keskipisteestä
+     * Vector paikka = RandomGen.NextVector(0.0, 300.0);
+     * (vinkki, käytä for-silmukkaa)
      */
     public virtual void Tehtava4() { throw new NotImplementedException(); }
 
     /*
-     * Tehtävänanto: Lisää peliin n kpl satunnaisessa paikassa olevaa VALKOISTA palloa
-     * (vinkki, käytä for-silmukkaa)
+     * Tehtävänanto: Lisää peliin reunat joka puolelle
      */
     public virtual void Tehtava5(int n) { throw new NotImplementedException(); }
 
     /*
-     * Tehtävänanto: Lisää peliin reunat joka puolelle
-     */
-    public virtual void Tehtava6() { throw new NotImplementedException(); }
-    
-    /*
      * Tehtävänanto: Lyö PUNAISELLE pallolle vauhtia satunnaiseen suuntaan
      *  (vinkki, tee Tehtava4-aliohjelmassa lisättävästä pallosta luokkamuuttuja) 
      */
-    public virtual void Tehtava7() { throw new NotImplementedException(); }
+    public virtual void Tehtava6() { throw new NotImplementedException(); }
 
     /*
      * Tehtävänanto: Kun kaksi VALKOISTA palloa osuu toisiinsa, pistä ne katoamaan
      *  lisäpisteitä jos saat ne räjähtämään (kersku siitä kaverille ja opettajille :)
      *  (vinkki, tarvitset törmäyskäsittelijää ja uuden aliohjelman)
      */
-    public virtual void Tehtava8() { throw new NotImplementedException(); }
-        
+    public virtual void Tehtava7() { throw new NotImplementedException(); }
 
     /*
      * Tehtävänanto: Aina kun välilyöntiä painetaan, lyö PUNAISELLE pallolle lisää vauhtia.
      * (vinkki: uudelleenkäytä Tehtava7-aliohjelmaa kutsumalla sitä näin "Tehtava7();")
+     */
+    public virtual void Tehtava8() { throw new NotImplementedException(); }
+
+    /*
+     * Tehtävänanto: ??
+     * (vinkki: ??)
      */
     public virtual void Tehtava9() { throw new NotImplementedException(); }
 

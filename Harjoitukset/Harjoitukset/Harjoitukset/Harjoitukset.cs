@@ -32,7 +32,7 @@ class Harjoitukset : Tarkistaja
     /*
     public override void Tehtava3()
     {
-        // Tehtävänanto: Lisää peliin pallo 
+        // Tehtävänanto: Lisää PUNAINEN peliin pallo 
 
         // TODO: Ota tehtävä pois kommenteista ja toteuta
     }
@@ -41,10 +41,11 @@ class Harjoitukset : Tarkistaja
     /*
     public override void Tehtava4()
     {
-        // Tehtävänanto: Lisää PUNAINEN pallo peliin satunnaiseen paikkaan
-
-        // Tässä tehdään satunnainen paikka korkeintaan 100.0 päähän ruudun keskipisteestä
-        Vector paikka = RandomGen.NextVector(0.0, 100.0);
+        // Tehtävänanto: Lisää peliin n kpl satunnaisessa paikassa olevaa VALKOISTA palloa
+           korkeintaan 300.0 päähän ruudun keskipisteestä
+           Vector paikka = RandomGen.NextVector(0.0, 300.0);
+        
+        // (vinkki, käytä for-silmukkaa)
 
         // TODO: Ota tehtävä pois kommenteista ja toteuta
     }
@@ -53,16 +54,6 @@ class Harjoitukset : Tarkistaja
     /*
     public override void Tehtava5(int n)
     {
-        // Tehtävänanto: Lisää peliin n kpl satunnaisessa paikassa olevaa VALKOISTA palloa
-        //   (vinkki, käytä for-silmukkaa)
-
-        // TODO: Ota tehtävä pois kommenteista ja toteuta
-    }
-    */
-
-    /*
-    public override void Tehtava6()
-    {
         // Tehtävänanto: Lisää peliin reunat joka puolelle
 
         // TODO: Ota tehtävä pois kommenteista ja toteuta
@@ -70,7 +61,7 @@ class Harjoitukset : Tarkistaja
     */
 
     /*
-    public override void Tehtava7()
+    public override void Tehtava6()
     {
         // Tehtävänanto: Lyö PUNAISELLE pallolle vauhtia satunnaiseen suuntaan
         //  (vinkki, tee Tehtava4-aliohjelmassa lisättävästä pallosta luokkamuuttuja) 
@@ -80,7 +71,7 @@ class Harjoitukset : Tarkistaja
     */
 
     /*
-    public override void Tehtava8()
+    public override void Tehtava7()
     {
         // Tehtävänanto: Kun kaksi VALKOISTA palloa osuu toisiinsa, pistä ne katoamaan
         //  lisäpisteitä jos saat ne räjähtämään (kersku siitä kaverille ja opettajille :)
@@ -91,10 +82,20 @@ class Harjoitukset : Tarkistaja
     */
 
     /*
-    public override void Tehtava9()
+    public override void Tehtava8()
     {
         // Tehtävänanto: Aina kun välilyöntiä painetaan, lyö PUNAISELLE pallolle lisää vauhtia.
         // (vinkki: uudelleenkäytä Tehtava7-aliohjelmaa kutsumalla sitä näin "Tehtava7();")
+
+        // TODO: Ota tehtävä pois kommenteista ja toteuta
+    }
+    */
+
+    /*
+    public override void Tehtava9()
+    {
+        // Tehtävänanto: ??
+        // (vinkki: ??)
 
         // TODO: Ota tehtävä pois kommenteista ja toteuta
     }
