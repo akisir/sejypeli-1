@@ -39,7 +39,7 @@ class Harjoitukset : Tarkistaja
     */
 
     /*
-    public override void Tehtava4()
+    public override void Tehtava4(int n)
     {
         // Tehtävänanto: Lisää peliin n kpl satunnaisessa paikassa olevaa VALKOISTA palloa
            korkeintaan 300.0 päähän ruudun keskipisteestä
@@ -52,7 +52,7 @@ class Harjoitukset : Tarkistaja
     */
 
     /*
-    public override void Tehtava5(int n)
+    public override void Tehtava5()
     {
         // Tehtävänanto: Lisää peliin reunat joka puolelle
 
@@ -64,18 +64,19 @@ class Harjoitukset : Tarkistaja
     public override void Tehtava6()
     {
         // Tehtävänanto: Lyö PUNAISELLE pallolle vauhtia satunnaiseen suuntaan
-        //  (vinkki, tee Tehtava4-aliohjelmassa lisättävästä pallosta luokkamuuttuja) 
+        //  (vinkki, tee Tehtava3-aliohjelmassa lisättävästä pallosta luokkamuuttuja) 
 
         // TODO: Ota tehtävä pois kommenteista ja toteuta
     }
     */
 
     /*
-    public override void Tehtava7()
+    public override void Tehtava7(List<GameObject> pallot)
     {
         // Tehtävänanto: Kun kaksi VALKOISTA palloa osuu toisiinsa, pistä ne katoamaan
         //  lisäpisteitä jos saat ne räjähtämään (kersku siitä kaverille ja opettajille :)
-        //  (vinkki, tarvitset törmäyskäsittelijää ja uuden aliohjelman)
+        //  (vinkki, käy pallot-lista läpi for-silmukassa ja lisää törmäyskäsittelijä,
+        //  tarvitset myös uuden aliohjelman)
 
         // TODO: Ota tehtävä pois kommenteista ja toteuta
     }
