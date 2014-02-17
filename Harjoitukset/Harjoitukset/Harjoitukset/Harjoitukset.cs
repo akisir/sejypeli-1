@@ -86,7 +86,7 @@ class Harjoitukset : Tarkistaja
     public override void Tehtava8()
     {
         // Tehtävänanto: Aina kun välilyöntiä painetaan, lyö PUNAISELLE pallolle lisää vauhtia.
-        // (vinkki: uudelleenkäytä Tehtava7-aliohjelmaa kutsumalla sitä näin "Tehtava7();")
+        // (vinkki: uudelleenkäytä Tehtava6-aliohjelmaa kutsumalla sitä näin "Tehtava6();")
 
         // TODO: Ota tehtävä pois kommenteista ja toteuta
     }
